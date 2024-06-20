@@ -13,6 +13,9 @@ import {AlertService} from '@app/core/services/alert.service';
 import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
 import {ProductsService} from '../services/products.service';
 import {Observable} from 'rxjs';
+import {InputMaskDirective} from "@app/shared/directives/input-mask.directive";
+import {TrimDirective} from "@app/shared/directives/trim.directive";
+import {LoadingService} from "@app/core/services/loading.service";
 
 @Component({
   selector: 'app-product-edit',
@@ -23,20 +26,22 @@ import {Observable} from 'rxjs';
     ReactiveFormsModule,
     RouterLink,
     NgSelectModule,
+    InputMaskDirective,
+    TrimDirective,
   ],
   templateUrl: './product-edit.component.html',
   styleUrl: './product-edit.component.scss',
 })
 export class ProductEditComponent implements OnInit {
   productForm: FormGroup = new FormGroup({});
-  screen: number = 1;
   images: string[] = [];
 
   constructor(
     private _alert: AlertService,
     private _product: ProductsService,
     @Inject(MAT_DIALOG_DATA) public data: any,
-    private _dialog: MatDialogRef<ProductEditComponent>
+    private _dialog: MatDialogRef<ProductEditComponent>,
+    private _loader: LoadingService,
   ) {
   }
 
@@ -77,54 +82,17 @@ export class ProductEditComponent implements OnInit {
         Validators.minLength(3),
       ]),
       price: new FormControl('', [Validators.required]),
-      categoryId: new FormControl(null, [Validators.required]),
-      images: new FormControl(''),
     });
   }
 
-  // https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg
-  pushImage() {
-    const img = this.productForm.get('images')?.value;
-    if (this.imageURLValidator({value: img} as FormControl) === null) {
-      this.productForm.get('images')?.setValue('');
-      this.images.push(img);
-    } else {
-      this.productForm.get('images')?.setValue('');
-      this._alert.error('Url no valida');
-    }
-  }
-
-  deleteImage(position: number) {
-    this.images.splice(position, 1);
-    this._alert.success('Producto eliminado');
-  }
-
-  imageURLValidator(control: FormControl): { [key: string]: boolean } | null {
-    const urlPattern =
-      /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?.(jpg|jpeg|png|gif|bmp)$/i;
-    if (!control.value || !urlPattern.test(control.value)) {
-      return {invalidImageUrl: true};
-    }
-    return null;
-  }
-
-
-  changeScreen(screen: number) {
-    if (this.productForm.valid) {
-      this.screen = screen;
-    } else {
-      this.productForm.markAllAsTouched();
-      this._alert.warning('Debes completar todos los campos');
-    }
-  }
 
   sendDataRegisterProduct() {
-    if (this.productForm.valid && this.images.length > 0) {
+    if (this.productForm.valid) {
+      this._loader.show();
       const dataProduct: any = {
         nombre: this.productForm.get('title')?.value,
         valor: this.productForm.get('price')?.value,
         detalle: this.productForm.get('description')?.value,
-        images: this.images,
       };
 
       const petition: Observable<any> = this.data
@@ -133,6 +101,7 @@ export class ProductEditComponent implements OnInit {
 
       petition.subscribe({
         next: () => {
+          this._loader.hide();
           this.productForm.reset();
           this.images = [];
           this.data ?
@@ -141,12 +110,14 @@ export class ProductEditComponent implements OnInit {
           this._product.getAllProducts();
         },
         error: () => {
+          this._loader.hide();
           this.data ?
             this._alert.error('Hubo un problema al actualizar el producto.') : this._alert.error('Hubo un problema al registrar el producto.');
         },
       });
     } else {
-      this._alert.warning('Debes agregar mínimo una imagen');
+      this.productForm.markAllAsTouched();
+      this._alert.warning('Debes completar todos los campos');
     }
   }
 }

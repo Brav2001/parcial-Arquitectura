@@ -25,22 +25,12 @@ export class TableComponent {
   @Output() edit: EventEmitter<any> = new EventEmitter<any>();
   @Output() delete: EventEmitter<any> = new EventEmitter<any>();
 
-  public displayedColumns: string[] = [];
-
-  // ngOnInit(): void {
-  //   const columnNames = this.tableColumns.map((tableColumn: TableColumn) => tableColumn.name);
-  //   if (this.rowActionName) {
-  //     this.displayedColumns = [this.rowActionName, ...columnNames]
-  //   } else {
-  //     this.displayedColumns = columnNames;
-  //   }
 
   addItem() {
     this.add.emit(true);
   }
 
   editItem(value: any): void {
-    // console.log(value)
     this.edit.emit(value);
   }
 

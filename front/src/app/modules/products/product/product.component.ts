@@ -61,11 +61,14 @@ export class ProductComponent implements OnInit {
         this.tableData = data;
         this._loading.hide();
       },
+      error: () => {
+        this._loading.hide();
+        this._alert.warning("Hubo un problema al intentar traer el producto")
+      }
     });
   }
 
   editProduct(value: any) {
-    console.log(value);
     const refDialog = this._dialog.open(ProductEditComponent, {
       data: value.id_producto,
     });
@@ -81,10 +84,14 @@ export class ProductComponent implements OnInit {
     this._alert.info("eliminando producto")
     this._product.deleteProduct(value).subscribe({
       next: () => {
-        this._loading.show();
+        this._loading.hide();
         this.getAllProduct();
         this._alert.success("Producto Eliminado")
       },
+      error: ()=>{
+        this._loading.hide();
+        this._alert.warning("Hubo un error al intentar eliminar el producto")
+      }
     });
   }
 

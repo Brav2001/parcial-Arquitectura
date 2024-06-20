@@ -42,7 +42,7 @@ export class LoginComponent implements OnInit {
 
   initForm(): void {
     this.loginForm = new FormGroup({
-      user_email: new FormControl('', [Validators.required, Validators.email]),
+      username: new FormControl('', [Validators.required, Validators.email]),
       user_password: new FormControl('', [Validators.required]),
     })
   }
@@ -52,7 +52,7 @@ export class LoginComponent implements OnInit {
       // john@mail.com
       // changeme
       const dataAuth: AuthLogin = {
-        email: this.loginForm.get('user_email')?.value,
+        username: this.loginForm.get('username')?.value,
         password: this.loginForm.get('user_password')?.value,
       }
       this._auth.login(dataAuth).subscribe({
@@ -60,7 +60,6 @@ export class LoginComponent implements OnInit {
           this._storage.setItem('access_token', data.access_token);
           this._storage.setItem('refresh_token', data.refresh_token);
           this._router.navigateByUrl('administration/product').then();
-          console.log(data)
         },
         error: () =>{
           this._alert.warning('Credenciales incorrectas')
@@ -70,17 +69,6 @@ export class LoginComponent implements OnInit {
       this.loginForm.markAllAsTouched()
     }
 
-  }
-
-
-  goTo() {
-    console.log(this.loginForm.value)
-    // this._router.navigateByUrl('administration/product').then(
-    //   () => {
-    //     this._alert.success('Prueba de alerta');
-    //
-    //   }
-    // );
   }
 
 }

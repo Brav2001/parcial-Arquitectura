@@ -18,7 +18,7 @@ export class AuthService {
   }
 
   public login(data: AuthLogin): Observable<AuthResponse> {
-    return this._http.post<AuthResponse>('https://api.escuelajs.co/api/v1/auth/login', data)
+    return this._http.post<AuthResponse>('http://localhost:8000/auth/login', data)
   }
 
   public logout(): void {

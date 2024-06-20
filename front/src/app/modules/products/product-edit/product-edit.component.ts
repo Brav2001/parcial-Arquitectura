@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import {Component, Inject, OnInit} from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -6,13 +6,13 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MessageErrorsDirective } from '@app/shared/directives/field-errors/directive/message-errors.directive';
-import { RouterLink } from '@angular/router';
-import { NgSelectModule } from '@ng-select/ng-select';
-import { AlertService } from '@app/core/services/alert.service';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { ProductsService } from '../services/products.service';
-import { Observable } from 'rxjs';
+import {MessageErrorsDirective} from '@app/shared/directives/field-errors/directive/message-errors.directive';
+import {RouterLink} from '@angular/router';
+import {NgSelectModule} from '@ng-select/ng-select';
+import {AlertService} from '@app/core/services/alert.service';
+import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
+import {ProductsService} from '../services/products.service';
+import {Observable} from 'rxjs';
 
 @Component({
   selector: 'app-product-edit',
@@ -32,41 +32,34 @@ export class ProductEditComponent implements OnInit {
   screen: number = 1;
   images: string[] = [];
 
-  category = [];
-
   constructor(
     private _alert: AlertService,
     private _product: ProductsService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private _dialog: MatDialogRef<ProductEditComponent>
-  ) {}
+  ) {
+  }
 
   setDataProduct(data: any) {
     this.productForm.get('title')?.setValue(data['title']);
     this.productForm.get('price')?.setValue(data['price']);
     this.productForm.get('description')?.setValue(data['description']);
-    this.productForm.get('categoryId')?.setValue(data['category']['id']);
   }
 
   ngOnInit(): void {
     this.initForm();
-    this.getCategories();
     if (this.data) {
       this.getProductById(this.data);
     }
   }
+
   getProductById(id: any) {
     this._product.getProductById(id).subscribe({
       next: (data) => {
         this.setDataProduct(data);
-        if (data.images[0].startsWith('["')) {
-          this.images = JSON.parse(data.images);
-        } else {
-          this.images = data.images;
-        }
       },
       error: () => {
-        this._alert.error('Al parecer ya borraron el producto. :((');
+        this._alert.error('Hubo un problema al obtener el producto :((');
       },
     });
   }
@@ -92,7 +85,7 @@ export class ProductEditComponent implements OnInit {
   // https://cdn.pixabay.com/photo/2024/02/26/19/39/monochrome-image-8598798_640.jpg
   pushImage() {
     const img = this.productForm.get('images')?.value;
-    if (this.imageURLValidator({ value: img } as FormControl) === null) {
+    if (this.imageURLValidator({value: img} as FormControl) === null) {
       this.productForm.get('images')?.setValue('');
       this.images.push(img);
     } else {
@@ -110,18 +103,11 @@ export class ProductEditComponent implements OnInit {
     const urlPattern =
       /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?.(jpg|jpeg|png|gif|bmp)$/i;
     if (!control.value || !urlPattern.test(control.value)) {
-      return { invalidImageUrl: true };
+      return {invalidImageUrl: true};
     }
     return null;
   }
 
-  getCategories() {
-    this._product.getCategories().subscribe({
-      next: (data: any) => {
-        this.category = data;
-      },
-    });
-  }
 
   changeScreen(screen: number) {
     if (this.productForm.valid) {
@@ -135,10 +121,9 @@ export class ProductEditComponent implements OnInit {
   sendDataRegisterProduct() {
     if (this.productForm.valid && this.images.length > 0) {
       const dataProduct: any = {
-        title: this.productForm.get('title')?.value,
-        price: this.productForm.get('price')?.value,
-        description: this.productForm.get('description')?.value,
-        categoryId: this.productForm.get('categoryId')?.value,
+        nombre: this.productForm.get('title')?.value,
+        valor: this.productForm.get('price')?.value,
+        detalle: this.productForm.get('description')?.value,
         images: this.images,
       };
 
@@ -150,16 +135,14 @@ export class ProductEditComponent implements OnInit {
         next: () => {
           this.productForm.reset();
           this.images = [];
-          this.data
-            ? this._alert.success('Producto actualizado exitosamente')
-            : this._alert.success('Producto registrado exitosamente');
+          this.data ?
+            this._alert.success('Producto actualizado exitosamente') : this._alert.success('Producto registrado exitosamente');
           this._dialog.close(true);
           this._product.getAllProducts();
         },
         error: () => {
-          this.data
-            ? this._alert.error('Hubo un problema al actualizar el producto.')
-            : this._alert.error('Hubo un problema al registrar el producto.');
+          this.data ?
+            this._alert.error('Hubo un problema al actualizar el producto.') : this._alert.error('Hubo un problema al registrar el producto.');
         },
       });
     } else {

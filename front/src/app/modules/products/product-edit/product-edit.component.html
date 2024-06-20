@@ -58,24 +58,6 @@
       </div>
     </div>
     <div class="col-12">
-      <div class="form-container margin-b">
-        <div class="form-group">
-          <label class="form-label writing-color">Categoria del producto</label>
-          <ng-select
-            [items]="category"
-            [clearable]="false"
-            [searchable]="false"
-            bindLabel="name"
-            bindValue="id"
-            formControlName="categoryId"
-            appMessageErrors
-            placeholder="Seleccione una categoria"
-          >
-          </ng-select>
-        </div>
-      </div>
-    </div>
-    <div class="col-12">
       <button class="btn" (click)="changeScreen(2)">Siguiente</button>
     </div>
     } @else if (screen === 2) {
@@ -86,7 +68,6 @@
           <input
             id="imageUrl"
             type="text"
-            appTrim
             appMessageErrors
             formControlName="images"
             placeholder="Ingrese la Url de la imagen"

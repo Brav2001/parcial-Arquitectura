@@ -4,6 +4,5 @@ export interface AuthLogin {
 }
 
 export interface AuthResponse {
-  access_token: string;
-  refresh_token: string;
+  token: string;
 }

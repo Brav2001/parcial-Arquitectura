@@ -1,4 +1,4 @@
-import {Component, Inject, OnInit} from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import {
   FormControl,
   FormGroup,
@@ -6,16 +6,16 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import {MessageErrorsDirective} from '@app/shared/directives/field-errors/directive/message-errors.directive';
-import {RouterLink} from '@angular/router';
-import {NgSelectModule} from '@ng-select/ng-select';
-import {AlertService} from '@app/core/services/alert.service';
-import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material/dialog';
-import {ProductsService} from '../services/products.service';
-import {Observable} from 'rxjs';
-import {InputMaskDirective} from "@app/shared/directives/input-mask.directive";
-import {TrimDirective} from "@app/shared/directives/trim.directive";
-import {LoadingService} from "@app/core/services/loading.service";
+import { MessageErrorsDirective } from '@app/shared/directives/field-errors/directive/message-errors.directive';
+import { RouterLink } from '@angular/router';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { AlertService } from '@app/core/services/alert.service';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { ProductsService } from '../services/products.service';
+import { Observable } from 'rxjs';
+import { InputMaskDirective } from '@app/shared/directives/input-mask.directive';
+import { TrimDirective } from '@app/shared/directives/trim.directive';
+import { LoadingService } from '@app/core/services/loading.service';
 
 @Component({
   selector: 'app-product-edit',
@@ -41,14 +41,13 @@ export class ProductEditComponent implements OnInit {
     private _product: ProductsService,
     @Inject(MAT_DIALOG_DATA) public data: any,
     private _dialog: MatDialogRef<ProductEditComponent>,
-    private _loader: LoadingService,
-  ) {
-  }
+    private _loader: LoadingService
+  ) {}
 
   setDataProduct(data: any) {
-    this.productForm.get('title')?.setValue(data['title']);
-    this.productForm.get('price')?.setValue(data['price']);
-    this.productForm.get('description')?.setValue(data['description']);
+    this.productForm.get('title')?.setValue(data['nombre']);
+    this.productForm.get('price')?.setValue(data['valor']);
+    this.productForm.get('description')?.setValue(data['detalle']);
   }
 
   ngOnInit(): void {
@@ -59,9 +58,11 @@ export class ProductEditComponent implements OnInit {
   }
 
   getProductById(id: any) {
+    console.log(id);
+
     this._product.getProductById(id).subscribe({
       next: (data) => {
-        this.setDataProduct(data);
+        this.setDataProduct(data.data);
       },
       error: () => {
         this._alert.error('Hubo un problema al obtener el producto :((');
@@ -85,7 +86,6 @@ export class ProductEditComponent implements OnInit {
     });
   }
 
-
   sendDataRegisterProduct() {
     if (this.productForm.valid) {
       this._loader.show();
@@ -104,15 +104,17 @@ export class ProductEditComponent implements OnInit {
           this._loader.hide();
           this.productForm.reset();
           this.images = [];
-          this.data ?
-            this._alert.success('Producto actualizado exitosamente') : this._alert.success('Producto registrado exitosamente');
+          this.data
+            ? this._alert.success('Producto actualizado exitosamente')
+            : this._alert.success('Producto registrado exitosamente');
           this._dialog.close(true);
           this._product.getAllProducts();
         },
         error: () => {
           this._loader.hide();
-          this.data ?
-            this._alert.error('Hubo un problema al actualizar el producto.') : this._alert.error('Hubo un problema al registrar el producto.');
+          this.data
+            ? this._alert.error('Hubo un problema al actualizar el producto.')
+            : this._alert.error('Hubo un problema al registrar el producto.');
         },
       });
     } else {
